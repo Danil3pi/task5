@@ -1,0 +1,79 @@
+import os
+from random import sample, randint
+from string import ascii_lowercase
+from pathlib import Path
+
+
+def getRandonFileName():
+    return ''.join(sample(ascii_uppercase, 6))
+
+newDir = getRandonFileName;
+os.mkdir(getRandonFileName)
+os.chdir(os.curdir + '/LabOsDir')
+
+os.mkdir('cur1')
+os.mkdir('cur1/cur2')
+os.mkdir('cur1/cur2/cur3')
+
+english_str = 'Hello World\n'
+russ_str = 'Привет мир!\n'
+
+def main():
+    for i in range(1, 4):
+        os.chdir(os.curdir + '/cur' + str(i))
+        filesAmountInDir = randint(5, 9)
+
+        rusList = fillOfFile(filesAmountInDir // 2, 'ru_') # Список файлов с русским текстом
+        engList = fillOfFile(filesAmountInDir - filesAmountInDir // 2, 'en_')
+    
+        writeInFile(russ_str, rusList)
+        writeInFile(english_str, engList)
+
+def fillOfFile(amount, prevName):
+    """Заполнение списка из имен файлов"""
+    fileList = []
+    for j in range(amount):
+        fileList.append(prevName + ''.join(sample(ascii_lowercase, 6)) + '.txt') #Случайное имя для файла
+    
+    return fileList;
+
+def writeInFile(str, filesList):
+    
+    for i in range(len(filesList)): # Запись в Файл русской фразы
+        phrase = str * randint(3, 10)
+        pathInFile = Path(filesList[i])
+        pathInFile.write_text(phrase)
+
+os.chdir('../../..')
+os.listdir('.')
+
+
+for i in range(1, 4):
+    os.chdir(os.curdir + '/cur' + str(i))
+    for file in os.listdir('.'):
+        print(file, os.path.getsize(file))
+
+os.chdir('../../..')
+os.listdir('.')
+
+
+
+for outer_i in range(1, 4):
+    os.chdir(os.curdir + '/cur' + str(outer_i))
+
+    listDir = os.listdir('.')
+    dictFromCurdir = {listDir[inner_i]: os.path.getsize(listDir[inner_i]) for inner_i in range(len(listDir))} # Словарь из текущей директории и размеров
+    newDictFromCurdir = {key : value for key, value in dictFromCurdir.items() if value == min(dictFromCurdir.values())}
+
+    open(list(newDictFromCurdir.keys())[0]).readlines()
+
+    endList = [os.remove(listDir[index]) for index in range(len(listDir)) if listDir[index] != list(newDictFromCurdir.keys())[0] and os.path.splitext(listDir[index])[1] == '.txt']
+
+os.chdir('../../..')
+
+for outer_i in range(1, 4):
+    os.chdir(os.curdir + '/cur' + str(outer_i))
+    
+    for file in os.listdir('.'):
+        if file[-4:] == '.txt':
+            print('min file in ', os.curdir + '/cur' + str(outer_i), "is ", file, os.path.getsize(file))
